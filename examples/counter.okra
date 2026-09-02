@@ -1,0 +1,33 @@
+// Closures. A function value carries the environment it was created in,
+// so each counter returned by makeCounter gets its own private `count`
+// that nothing else can touch.
+
+fun makeCounter(step) {
+  let count = 0;
+  return fun() {
+    count = count + step;
+    return count;
+  };
+}
+
+let ones = makeCounter(1);
+let tens = makeCounter(10);
+
+// The two counters advance independently.
+print(ones()); // 1
+print(ones()); // 2
+print(tens()); // 10
+print(ones()); // 3
+print(tens()); // 20
+
+// Loop variables are captured per iteration: each closure pushed here
+// remembers the `i` of its own turn around the loop, not a shared one.
+let fns = [];
+for (i in range(3)) {
+  push(fns, fun() {
+    return i * 100;
+  });
+}
+for (f in fns) {
+  print(f()); // 0, then 100, then 200
+}

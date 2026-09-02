@@ -1,0 +1,62 @@
+// A very small text adventure with a scripted player.
+//
+// The world is a map of rooms; each room is itself a map holding a
+// description, its exits (direction name -> room name), and possibly an
+// item. The player follows a fixed script of commands so the run is
+// deterministic, but swap `script` for real input handling and the same
+// engine works interactively.
+
+let rooms = {
+  "clearing": {
+    "desc": "A sunlit clearing. Paths lead north and east.",
+    "north": "cave",
+    "east": "river",
+  },
+  "cave": {
+    "desc": "A damp cave. Something glitters here. The exit is south.",
+    "south": "clearing",
+    "item": "brass key",
+  },
+  "river": {
+    "desc": "A fast river blocks the way. A path leads west.",
+    "west": "clearing",
+  },
+};
+
+let here = "clearing";
+let inventory = [];
+let script = ["north", "take", "take", "south", "east", "inventory", "quit"];
+
+print(rooms[here]["desc"]);
+
+for (command in script) {
+  print("> " + command);
+  let room = rooms[here];
+
+  if (command == "quit") {
+    print("Thanks for playing.");
+    break;
+  } else if (command == "take") {
+    if (room["item"] != nil) {
+      push(inventory, room["item"]);
+      print("You take the " + room["item"] + ".");
+      room["item"] = nil; // the item is gone from the room now
+    } else {
+      print("There is nothing here to take.");
+    }
+  } else if (command == "inventory") {
+    if (len(inventory) == 0) {
+      print("You are carrying nothing.");
+    } else {
+      print("You are carrying:");
+      for (thing in inventory) {
+        print("- " + thing);
+      }
+    }
+  } else if (room[command] != nil) {
+    here = room[command];
+    print(rooms[here]["desc"]);
+  } else {
+    print("You cannot go that way.");
+  }
+}

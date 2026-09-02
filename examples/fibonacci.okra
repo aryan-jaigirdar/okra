@@ -1,0 +1,37 @@
+// Fibonacci two ways: plain recursion, then memoized with a map.
+
+// Plain recursion. Elegant, but every call recomputes its subproblems,
+// so the running time is exponential in n.
+fun fib(n) {
+  if (n < 2) {
+    return n;
+  }
+  return fib(n - 1) + fib(n - 2);
+}
+
+// Memoized version. Map keys are strings, so the number is converted
+// with str(n) before it is used as a key. A missing key reads as nil,
+// which makes the cache check a simple comparison.
+let cache = {};
+
+fun fibMemo(n) {
+  if (n < 2) {
+    return n;
+  }
+  let key = str(n);
+  if (cache[key] != nil) {
+    return cache[key];
+  }
+  let result = fibMemo(n - 1) + fibMemo(n - 2);
+  cache[key] = result;
+  return result;
+}
+
+print("recursive:");
+for (i in range(10)) {
+  print("fib(" + str(i) + ") =", fib(i));
+}
+
+print("memoized:");
+print("fibMemo(35) =", fibMemo(35));
+print("cache holds", len(cache), "entries");

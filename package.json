@@ -1,0 +1,39 @@
+{
+  "name": "okra-lang",
+  "version": "0.1.0",
+  "description": "A small dynamically typed scripting language, implemented from scratch in TypeScript with zero runtime dependencies",
+  "keywords": [
+    "interpreter",
+    "language",
+    "scripting",
+    "pratt-parser",
+    "tree-walking-interpreter"
+  ],
+  "author": "Aryan Jaigirdar <jaigirdar.aryan@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "okra": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "dev": "tsx src/cli.ts",
+    "repl": "tsx src/cli.ts repl"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,17 @@
+// FizzBuzz, the classic warm-up.
+//
+// Prints the numbers 1 through 20, except that multiples of 3 become
+// "Fizz", multiples of 5 become "Buzz", and multiples of both become
+// "FizzBuzz". Shows off for-in, range, modulo, and else-if chains.
+
+for (n in range(1, 21)) {
+  if (n % 15 == 0) {
+    print("FizzBuzz");
+  } else if (n % 3 == 0) {
+    print("Fizz");
+  } else if (n % 5 == 0) {
+    print("Buzz");
+  } else {
+    print(n);
+  }
+}

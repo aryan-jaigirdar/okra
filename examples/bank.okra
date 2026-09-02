@@ -1,0 +1,57 @@
+// A tiny bank account simulation.
+//
+// An account is a map of functions. The functions all close over the same
+// `balance` and `history` variables, so the state is shared between them
+// but invisible to the rest of the program: the only way to touch a
+// balance is through the account's own operations.
+
+fun makeAccount(owner) {
+  let balance = 0;
+  let history = [];
+
+  let deposit = fun(amount) {
+    if (amount <= 0) {
+      print("  rejected: deposit must be positive");
+      return false;
+    }
+    balance = balance + amount;
+    push(history, "deposit " + str(amount));
+    print("  deposited", amount, "(balance is now " + str(balance) + ")");
+    return true;
+  };
+
+  let withdraw = fun(amount) {
+    if (amount > balance) {
+      print("  rejected: insufficient funds for", amount, "(balance is " + str(balance) + ")");
+      return false;
+    }
+    balance = balance - amount;
+    push(history, "withdraw " + str(amount));
+    print("  withdrew", amount, "(balance is now " + str(balance) + ")");
+    return true;
+  };
+
+  let statement = fun() {
+    print("statement for " + owner + ":");
+    for (entry in history) {
+      print("  " + entry);
+    }
+    print("  final balance:", balance);
+  };
+
+  return {
+    "deposit": deposit,
+    "withdraw": withdraw,
+    "statement": statement,
+  };
+}
+
+let account = makeAccount("Ada");
+
+print("opening an account for Ada");
+account["deposit"](120);
+account["withdraw"](50);
+account["withdraw"](200);
+account["deposit"](-5);
+account["deposit"](30);
+account["statement"]();
