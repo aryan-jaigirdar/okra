@@ -71,6 +71,21 @@ const BANK_EXPECTED =
     "  final balance: 100",
   ].join("\n") + "\n";
 
+const STRINGS_EXPECTED =
+  [
+    "fields: 5",
+    "normalized: ada | gracie | alan | linus | ada",
+    "sorted: ada | ada | alan | gracie | linus",
+    "original still: ada | gracie | alan | linus | ada",
+    "reversed: linus | gracie | alan | ada | ada",
+    "banner: ADA ADA ALAN GRACIE LINUS",
+    "index of ADA: 0",
+    "index of BOB: -1",
+    "average length: 4.2",
+    "floor: 4 ceil: 5",
+    "abs(-average): 4.2",
+  ].join("\n") + "\n";
+
 const ADVENTURE_EXPECTED =
   [
     "A sunlit clearing. Paths lead north and east.",
@@ -98,6 +113,7 @@ describe("examples", () => {
     ["counter.okra", COUNTER_EXPECTED],
     ["bank.okra", BANK_EXPECTED],
     ["adventure.okra", ADVENTURE_EXPECTED],
+    ["strings.okra", STRINGS_EXPECTED],
   ];
 
   it.each(cases)("%s produces its documented output", (file, expected) => {

@@ -137,6 +137,178 @@ export function installBuiltins(
     return result;
   });
 
+  // upper(s): the string with every character upper-cased.
+  define("upper", 1, 1, (args, pos) => {
+    const s = arg(args, 0);
+    if (typeof s !== "string") {
+      throw new RuntimeError(`upper expects a string, got ${typeOf(s)}`, pos);
+    }
+    return s.toUpperCase();
+  });
+
+  // lower(s): the string with every character lower-cased.
+  define("lower", 1, 1, (args, pos) => {
+    const s = arg(args, 0);
+    if (typeof s !== "string") {
+      throw new RuntimeError(`lower expects a string, got ${typeOf(s)}`, pos);
+    }
+    return s.toLowerCase();
+  });
+
+  // trim(s): s with leading and trailing whitespace removed.
+  define("trim", 1, 1, (args, pos) => {
+    const s = arg(args, 0);
+    if (typeof s !== "string") {
+      throw new RuntimeError(`trim expects a string, got ${typeOf(s)}`, pos);
+    }
+    return s.trim();
+  });
+
+  // split(s, sep): the pieces of s between each occurrence of sep, as an
+  // array of strings. An empty separator splits s into its characters.
+  define("split", 2, 2, (args, pos) => {
+    const s = arg(args, 0);
+    const sep = arg(args, 1);
+    if (typeof s !== "string") {
+      throw new RuntimeError(`split expects a string, got ${typeOf(s)}`, pos);
+    }
+    if (typeof sep !== "string") {
+      throw new RuntimeError(
+        `split expects a string separator, got ${typeOf(sep)}`,
+        pos,
+      );
+    }
+    return s.split(sep);
+  });
+
+  // join(array, sep): the array's elements joined into one string with sep
+  // between them. Every element must be a string.
+  define("join", 2, 2, (args, pos) => {
+    const array = arg(args, 0);
+    const sep = arg(args, 1);
+    if (!Array.isArray(array)) {
+      throw new RuntimeError(`join expects an array, got ${typeOf(array)}`, pos);
+    }
+    if (typeof sep !== "string") {
+      throw new RuntimeError(
+        `join expects a string separator, got ${typeOf(sep)}`,
+        pos,
+      );
+    }
+    const parts = array.map((el) => {
+      if (typeof el !== "string") {
+        throw new RuntimeError(
+          `join expects an array of strings, got ${typeOf(el)}`,
+          pos,
+        );
+      }
+      return el;
+    });
+    return parts.join(sep);
+  });
+
+  // indexOf(s, sub): the index of the first occurrence of sub in s, or -1 if
+  // sub does not occur. An empty sub is found at index 0.
+  define("indexOf", 2, 2, (args, pos) => {
+    const s = arg(args, 0);
+    const sub = arg(args, 1);
+    if (typeof s !== "string") {
+      throw new RuntimeError(`indexOf expects a string, got ${typeOf(s)}`, pos);
+    }
+    if (typeof sub !== "string") {
+      throw new RuntimeError(
+        `indexOf expects a string to search for, got ${typeOf(sub)}`,
+        pos,
+      );
+    }
+    return s.indexOf(sub);
+  });
+
+  // sort(array): a new array with the elements in ascending order, leaving
+  // the original untouched. The elements must be all numbers (compared
+  // numerically) or all strings (compared lexicographically).
+  define("sort", 1, 1, (args, pos) => {
+    const array = arg(args, 0);
+    if (!Array.isArray(array)) {
+      throw new RuntimeError(`sort expects an array, got ${typeOf(array)}`, pos);
+    }
+    const copy = [...array];
+    if (copy.length === 0) return copy;
+    const kind = typeOf(copy[0] ?? null);
+    if (kind === "number") {
+      for (const el of copy) {
+        if (typeof el !== "number") {
+          throw new RuntimeError(
+            `sort expects all elements to be numbers, got ${typeOf(el)}`,
+            pos,
+          );
+        }
+      }
+      copy.sort((a, b) => (a as number) - (b as number));
+      return copy;
+    }
+    if (kind === "string") {
+      for (const el of copy) {
+        if (typeof el !== "string") {
+          throw new RuntimeError(
+            `sort expects all elements to be strings, got ${typeOf(el)}`,
+            pos,
+          );
+        }
+      }
+      copy.sort((a, b) => {
+        const x = a as string;
+        const y = b as string;
+        return x < y ? -1 : x > y ? 1 : 0;
+      });
+      return copy;
+    }
+    throw new RuntimeError(
+      `sort expects an array of numbers or strings, got ${kind}`,
+      pos,
+    );
+  });
+
+  // reverse(array): a new array with the elements in reverse order, leaving
+  // the original untouched.
+  define("reverse", 1, 1, (args, pos) => {
+    const array = arg(args, 0);
+    if (!Array.isArray(array)) {
+      throw new RuntimeError(
+        `reverse expects an array, got ${typeOf(array)}`,
+        pos,
+      );
+    }
+    return [...array].reverse();
+  });
+
+  // floor(n): the largest integer less than or equal to n.
+  define("floor", 1, 1, (args, pos) => {
+    const n = arg(args, 0);
+    if (typeof n !== "number") {
+      throw new RuntimeError(`floor expects a number, got ${typeOf(n)}`, pos);
+    }
+    return Math.floor(n);
+  });
+
+  // ceil(n): the smallest integer greater than or equal to n.
+  define("ceil", 1, 1, (args, pos) => {
+    const n = arg(args, 0);
+    if (typeof n !== "number") {
+      throw new RuntimeError(`ceil expects a number, got ${typeOf(n)}`, pos);
+    }
+    return Math.ceil(n);
+  });
+
+  // abs(n): the absolute value of n.
+  define("abs", 1, 1, (args, pos) => {
+    const n = arg(args, 0);
+    if (typeof n !== "number") {
+      throw new RuntimeError(`abs expects a number, got ${typeOf(n)}`, pos);
+    }
+    return Math.abs(n);
+  });
+
   // clock(): seconds since the Unix epoch, with sub-second precision.
   define("clock", 0, 0, () => Date.now() / 1000);
 }

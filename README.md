@@ -109,6 +109,14 @@ print(10 % 3);      // 1
 print(-4 * -5);     // 20
 ```
 
+`floor`, `ceil`, and `abs` round down, round up, and take the absolute value.
+
+```
+print(floor(3.7));  // 3
+print(ceil(3.2));   // 4
+print(abs(-5));     // 5
+```
+
 Comparisons `< <= > >=` work on two numbers or two strings (lexicographic).
 Equality `==` and `!=` work on any values: numbers, strings, booleans, and
 nil compare by value; arrays, maps, and functions compare by identity. Values
@@ -144,6 +152,19 @@ print(len(s));    // 13
 print("a" < "b"); // true
 ```
 
+A handful of builtins cover the common text chores. `upper` and `lower` change
+case, `trim` strips surrounding whitespace, `indexOf` locates a substring (or
+returns -1), and `split` and `join` move between a string and an array of
+strings. An empty separator splits a string into its characters.
+
+```
+print(upper("okra"));            // OKRA
+print(trim("  spaced  "));       // spaced
+print(indexOf("okra", "kr"));    // 1
+print(split("a,b,c", ","));      // ["a", "b", "c"]
+print(join(["a", "b", "c"], "-")); // a-b-c
+```
+
 ### Arrays
 
 Arrays are ordered, heterogeneous, and grow through `push`. Indexing is
@@ -158,6 +179,16 @@ items[0] = 100;
 push(items, "more");
 print(pop(items));       // more
 print(len(items));       // 3
+```
+
+`sort` and `reverse` each return a new array and leave their argument alone.
+`sort` orders an array of all numbers or all strings; a mix is a runtime error.
+
+```
+let ns = [3, 1, 2];
+print(sort(ns));     // [1, 2, 3]
+print(reverse(ns));  // [2, 1, 3]
+print(ns);           // [3, 1, 2], unchanged
 ```
 
 ### Maps
@@ -249,6 +280,14 @@ comment form.
 | `str(x)`             | string                                                                 | The display form of any value, same as `print` uses. |
 | `num(x)`             | number or nil                                                          | Parses a string to a number; `nil` if it cannot. Numbers pass through. |
 | `range(end)`, `range(start, end)`, `range(start, end, step)` | array of numbers | From `start` (default 0) up to but not including `end`. `step` defaults to 1, may be negative, must not be 0. |
+| `upper(s)`, `lower(s)` | string                                                               | The string with every character upper- or lower-cased. |
+| `trim(s)`            | string                                                                 | The string with leading and trailing whitespace removed. |
+| `split(s, sep)`      | array of strings                                                       | The pieces of `s` between each `sep`. An empty `sep` splits into characters. |
+| `join(array, sep)`   | string                                                                 | The array's elements joined with `sep` between them. Every element must be a string. |
+| `indexOf(s, sub)`    | number                                                                 | The index of the first occurrence of `sub` in `s`, or -1 if it does not occur. |
+| `sort(array)`        | a new array                                                            | The elements in ascending order, all numbers or all strings. Does not mutate the original. |
+| `reverse(array)`     | a new array                                                            | The elements in reverse order. Does not mutate the original. |
+| `floor(n)`, `ceil(n)`, `abs(n)` | number                                                      | Round down, round up, or absolute value. |
 | `clock()`            | number                                                                 | Seconds since the Unix epoch, with sub-second precision. Useful for timing. |
 
 ## Grammar sketch
@@ -412,12 +451,14 @@ src/
   parser.ts       tokens to AST (Pratt expressions, recovery)
   values.ts       runtime value model and display formatting
   environment.ts  scope chain
-  builtins.ts     print, len, push, pop, keys, type, str, num, range, clock
+  builtins.ts     print, len, push, pop, keys, type, str, num, range,
+                  upper, lower, trim, split, join, indexOf, sort, reverse,
+                  floor, ceil, abs, clock
   interpreter.ts  tree-walking evaluator
   errors.ts       positioned errors and excerpt rendering
   repl.ts         multi-line REPL
   cli.ts          run | repl | tokens | ast
-examples/         five commented programs, each covered by an exact-output test
+examples/         six commented programs, each covered by an exact-output test
 tests/            vitest suites for every stage plus end-to-end runs
 ```
 

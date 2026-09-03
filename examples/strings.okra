@@ -1,0 +1,43 @@
+// Text and collection helpers. This program tidies up a messy line of names
+// and reports on it, touching most of the string, array, and numeric builtins
+// along the way.
+
+// A raw line with padding, mixed case, and inconsistent spacing.
+let raw = "  Ada, Gracie , alan,LINUS,  ada ";
+
+// split breaks the line into fields on each comma. The fields still carry
+// stray spaces and mixed case at this point.
+let fields = split(raw, ",");
+print("fields:", len(fields));
+
+// Normalize every field: trim the surrounding spaces, then lower-case it.
+let names = [];
+for (field in fields) {
+  push(names, lower(trim(field)));
+}
+print("normalized:", join(names, " | "));
+
+// sort returns a NEW array, so `names` keeps its original order.
+let ordered = sort(names);
+print("sorted:", join(ordered, " | "));
+print("original still:", join(names, " | "));
+
+// reverse also returns a new array rather than mutating its argument.
+print("reversed:", join(reverse(ordered), " | "));
+
+// upper and indexOf operate on a single string. indexOf reports -1 when the
+// substring is absent.
+let banner = upper(join(ordered, " "));
+print("banner:", banner);
+print("index of ADA:", indexOf(banner, "ADA"));
+print("index of BOB:", indexOf(banner, "BOB"));
+
+// The numeric helpers round a fractional average of the name lengths.
+let total = 0;
+for (name in names) {
+  total = total + len(name);
+}
+let average = total / len(names);
+print("average length:", average);
+print("floor:", floor(average), "ceil:", ceil(average));
+print("abs(-average):", abs(0 - average));

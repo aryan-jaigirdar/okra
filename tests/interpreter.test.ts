@@ -455,6 +455,124 @@ describe("builtins", () => {
     );
   });
 
+  it("upper and lower convert case and reject non-strings", () => {
+    expect(run('upper("Okra");').result).toBe("OKRA");
+    expect(run('lower("Okra");').result).toBe("okra");
+    expect(run('upper("");').result).toBe("");
+    expect(runError("upper(1);").message).toContain(
+      "upper expects a string, got number",
+    );
+    expect(runError("lower([]);").message).toContain(
+      "lower expects a string, got array",
+    );
+  });
+
+  it("trim removes leading and trailing whitespace only", () => {
+    expect(run('trim("  hi  ");').result).toBe("hi");
+    expect(run('trim("\\n\\ta b\\t\\n");').result).toBe("a b");
+    expect(run('trim("nothing");').result).toBe("nothing");
+    expect(runError("trim(nil);").message).toContain(
+      "trim expects a string, got nil",
+    );
+  });
+
+  it("split breaks on a separator and on empty into characters", () => {
+    expect(runOutput('print(split("a,b,c", ","));')).toBe(
+      '["a", "b", "c"]\n',
+    );
+    expect(runOutput('print(split("abc", ""));')).toBe('["a", "b", "c"]\n');
+    expect(runOutput('print(split("abc", "x"));')).toBe('["abc"]\n');
+    expect(runOutput('print(split(",", ","));')).toBe('["", ""]\n');
+    expect(runOutput('print(split("", ""));')).toBe("[]\n");
+    expect(runError('split(1, ",");').message).toContain(
+      "split expects a string, got number",
+    );
+    expect(runError('split("a", 1);').message).toContain(
+      "split expects a string separator, got number",
+    );
+  });
+
+  it("join concatenates string elements and rejects other types", () => {
+    expect(run('join(["a", "b", "c"], "-");').result).toBe("a-b-c");
+    expect(run('join([], ",");').result).toBe("");
+    expect(run('join(["solo"], ",");').result).toBe("solo");
+    expect(runError('join("ab", ",");').message).toContain(
+      "join expects an array, got string",
+    );
+    expect(runError('join(["a"], 1);').message).toContain(
+      "join expects a string separator, got number",
+    );
+    expect(runError('join(["a", 2], ",");').message).toContain(
+      "join expects an array of strings, got number",
+    );
+  });
+
+  it("indexOf finds substrings and returns -1 when absent", () => {
+    expect(run('indexOf("okra", "kr");').result).toBe(1);
+    expect(run('indexOf("okra", "o");').result).toBe(0);
+    expect(run('indexOf("okra", "z");').result).toBe(-1);
+    expect(run('indexOf("okra", "");').result).toBe(0);
+    expect(runError("indexOf(1, \"a\");").message).toContain(
+      "indexOf expects a string, got number",
+    );
+    expect(runError('indexOf("a", 1);').message).toContain(
+      "indexOf expects a string to search for, got number",
+    );
+  });
+
+  it("sort returns a new sorted array without mutating the original", () => {
+    expect(runOutput("print(sort([3, 1, 2, 10]));")).toBe("[1, 2, 3, 10]\n");
+    expect(runOutput('print(sort(["banana", "apple", "cherry"]));')).toBe(
+      '["apple", "banana", "cherry"]\n',
+    );
+    expect(runOutput("print(sort([]));")).toBe("[]\n");
+    expect(
+      runOutput("let a = [3, 1, 2]; let b = sort(a); print(b); print(a);"),
+    ).toBe("[1, 2, 3]\n[3, 1, 2]\n");
+    expect(runError('sort([1, "two"]);').message).toContain(
+      "sort expects all elements to be numbers, got string",
+    );
+    expect(runError('sort(["a", 2]);').message).toContain(
+      "sort expects all elements to be strings, got number",
+    );
+    expect(runError("sort([true, false]);").message).toContain(
+      "sort expects an array of numbers or strings, got boolean",
+    );
+    expect(runError("sort(5);").message).toContain(
+      "sort expects an array, got number",
+    );
+  });
+
+  it("reverse returns a new reversed array without mutating the original", () => {
+    expect(runOutput('print(reverse([1, "two", 3]));')).toBe('[3, "two", 1]\n');
+    expect(runOutput("print(reverse([]));")).toBe("[]\n");
+    expect(
+      runOutput("let a = [1, 2, 3]; let b = reverse(a); print(b); print(a);"),
+    ).toBe("[3, 2, 1]\n[1, 2, 3]\n");
+    expect(runError('reverse("ab");').message).toContain(
+      "reverse expects an array, got string",
+    );
+  });
+
+  it("floor, ceil, and abs compute numeric helpers", () => {
+    expect(run("floor(3.7);").result).toBe(3);
+    expect(run("floor(-3.2);").result).toBe(-4);
+    expect(run("ceil(3.2);").result).toBe(4);
+    expect(run("ceil(-3.7);").result).toBe(-3);
+    expect(run("abs(-5);").result).toBe(5);
+    expect(run("abs(5);").result).toBe(5);
+    expect(run("floor(4);").result).toBe(4);
+    expect(runError('floor("3");').message).toContain(
+      "floor expects a number, got string",
+    );
+    expect(runError("ceil(nil);").message).toContain(
+      "ceil expects a number, got nil",
+    );
+    expect(runError("abs([]);").message).toContain(
+      "abs expects a number, got array",
+    );
+  });
+
   it("clock returns a number", () => {
     expect(run("type(clock());").result).toBe("number");
   });
