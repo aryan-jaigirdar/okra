@@ -52,7 +52,11 @@ export class Interpreter {
         process.stdout.write(text);
       });
     this.globals = new Environment(null);
-    installBuiltins(this.globals, write);
+    // Hand builtins the same call mechanism a call expression uses, so a
+    // builtin like map can invoke an okra function value passed as an argument.
+    installBuiltins(this.globals, write, (callee, args, pos) =>
+      this.callValue(callee, args, pos),
+    );
   }
 
   /**

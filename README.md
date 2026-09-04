@@ -191,6 +191,22 @@ print(reverse(ns));  // [2, 1, 3]
 print(ns);           // [3, 1, 2], unchanged
 ```
 
+Because functions are first-class values, `map`, `filter`, and `reduce` each
+take a function and apply it across an array. `map` transforms every element,
+`filter` keeps the elements whose result is truthy, and `reduce` folds the
+array down to a single value from an initial accumulator. `map` and `filter`
+return new arrays and leave their argument alone.
+
+```
+let ns = [1, 2, 3, 4];
+print(map(ns, fun(n) { return n * n; }));           // [1, 4, 9, 16]
+print(filter(ns, fun(n) { return n % 2 == 0; }));   // [2, 4]
+print(reduce(ns, fun(acc, n) { return acc + n; }, 0)); // 10
+```
+
+The function argument can be an anonymous function, a named one, or even a
+builtin, since a builtin is a function value too (`map(["a"], upper)`).
+
 ### Maps
 
 Maps associate string keys with any value and preserve insertion order. Keys
@@ -287,6 +303,9 @@ comment form.
 | `indexOf(s, sub)`    | number                                                                 | The index of the first occurrence of `sub` in `s`, or -1 if it does not occur. |
 | `sort(array)`        | a new array                                                            | The elements in ascending order, all numbers or all strings. Does not mutate the original. |
 | `reverse(array)`     | a new array                                                            | The elements in reverse order. Does not mutate the original. |
+| `map(array, fn)`     | a new array                                                            | `fn` applied to each element, in order. Does not mutate the original. |
+| `filter(array, fn)`  | a new array                                                            | The elements for which `fn` returns a truthy value. Does not mutate the original. |
+| `reduce(array, fn, initial)` | any value                                                      | Folds the array left to right: `fn(accumulator, element)` from `initial`. Returns `initial` for an empty array. |
 | `floor(n)`, `ceil(n)`, `abs(n)` | number                                                      | Round down, round up, or absolute value. |
 | `clock()`            | number                                                                 | Seconds since the Unix epoch, with sub-second precision. Useful for timing. |
 
@@ -453,12 +472,12 @@ src/
   environment.ts  scope chain
   builtins.ts     print, len, push, pop, keys, type, str, num, range,
                   upper, lower, trim, split, join, indexOf, sort, reverse,
-                  floor, ceil, abs, clock
+                  map, filter, reduce, floor, ceil, abs, clock
   interpreter.ts  tree-walking evaluator
   errors.ts       positioned errors and excerpt rendering
   repl.ts         multi-line REPL
   cli.ts          run | repl | tokens | ast
-examples/         six commented programs, each covered by an exact-output test
+examples/         seven commented programs, each covered by an exact-output test
 tests/            vitest suites for every stage plus end-to-end runs
 ```
 

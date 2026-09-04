@@ -1,0 +1,52 @@
+// Higher-order builtins. map, filter, and reduce each take a function value as
+// an argument and apply it across an array, so small named or anonymous
+// functions compose into short data pipelines without writing loops by hand.
+
+// A batch of daily temperature readings in Celsius.
+let celsius = [0, 15, 22, 30, -4];
+
+// map builds a NEW array by calling its function on each element. Here it
+// converts every reading to Fahrenheit, leaving `celsius` untouched.
+fun toFahrenheit(c) {
+  return c * 9 / 5 + 32;
+}
+let fahrenheit = map(celsius, toFahrenheit);
+print("celsius:", celsius);
+print("fahrenheit:", fahrenheit);
+
+// The function can be anonymous and written right at the call site.
+let doubled = map([1, 2, 3, 4], fun(n) { return n * 2; });
+print("doubled:", doubled);
+
+// A builtin is itself a function value, so it can be passed straight through.
+print("shouted:", map(["okra", "map", "reduce"], upper));
+
+// filter keeps only the elements for which its function returns a truthy
+// value. okra's rule that only false and nil are falsy applies here too.
+fun isWarm(c) {
+  return c >= 20;
+}
+let warm = filter(celsius, isWarm);
+print("warm days:", warm);
+print("warm day count:", len(warm));
+
+// reduce folds an array down to a single value, threading an accumulator from
+// an initial value through fn(accumulator, element) for each element.
+fun add(acc, n) {
+  return acc + n;
+}
+let total = reduce(celsius, add, 0);
+print("total celsius:", total);
+print("average celsius:", total / len(celsius));
+
+// The accumulator can be any value, not just a number. Folding with a string
+// initial value stitches the readings into one labelled line.
+fun appendReading(line, c) {
+  return line + " " + str(c);
+}
+print("log:" + reduce(celsius, appendReading, ""));
+
+// The three compose into a single pipeline: pick the warm readings, convert
+// them to Fahrenheit, then sum the result.
+let warmFahrenheitTotal = reduce(map(filter(celsius, isWarm), toFahrenheit), add, 0);
+print("warm fahrenheit total:", warmFahrenheitTotal);

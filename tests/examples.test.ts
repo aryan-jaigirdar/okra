@@ -86,6 +86,20 @@ const STRINGS_EXPECTED =
     "abs(-average): 4.2",
   ].join("\n") + "\n";
 
+const HIGHER_ORDER_EXPECTED =
+  [
+    "celsius: [0, 15, 22, 30, -4]",
+    "fahrenheit: [32, 59, 71.6, 86, 24.8]",
+    "doubled: [2, 4, 6, 8]",
+    'shouted: ["OKRA", "MAP", "REDUCE"]',
+    "warm days: [22, 30]",
+    "warm day count: 2",
+    "total celsius: 63",
+    "average celsius: 12.6",
+    "log: 0 15 22 30 -4",
+    "warm fahrenheit total: 157.6",
+  ].join("\n") + "\n";
+
 const ADVENTURE_EXPECTED =
   [
     "A sunlit clearing. Paths lead north and east.",
@@ -114,6 +128,7 @@ describe("examples", () => {
     ["bank.okra", BANK_EXPECTED],
     ["adventure.okra", ADVENTURE_EXPECTED],
     ["strings.okra", STRINGS_EXPECTED],
+    ["higher_order.okra", HIGHER_ORDER_EXPECTED],
   ];
 
   it.each(cases)("%s produces its documented output", (file, expected) => {

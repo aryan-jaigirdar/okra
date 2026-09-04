@@ -7,6 +7,7 @@ import { RuntimeError } from "./errors.js";
 import type { Position } from "./token.js";
 import {
   BuiltinFn,
+  isTruthy,
   OkraMap,
   toDisplayString,
   typeOf,
@@ -23,6 +24,10 @@ function arg(args: Value[], i: number): Value {
 export function installBuiltins(
   env: Environment,
   write: (text: string) => void,
+  // Invokes a callable value the way a call expression would, reusing the
+  // interpreter's argument binding, arity checks, and return handling. This is
+  // what lets a builtin take an okra function and apply it, as map does.
+  call: (callee: Value, args: Value[], pos: Position) => Value,
 ): void {
   const define = (
     name: string,
@@ -280,6 +285,66 @@ export function installBuiltins(
       );
     }
     return [...array].reverse();
+  });
+
+  // map(array, fn): a new array holding fn applied to each element of array,
+  // in order. fn is called with one argument. The original array is untouched.
+  define("map", 2, 2, (args, pos) => {
+    const array = arg(args, 0);
+    const fn = arg(args, 1);
+    if (!Array.isArray(array)) {
+      throw new RuntimeError(`map expects an array, got ${typeOf(array)}`, pos);
+    }
+    if (typeOf(fn) !== "function") {
+      throw new RuntimeError(`map expects a function, got ${typeOf(fn)}`, pos);
+    }
+    return array.map((el) => call(fn, [el], pos));
+  });
+
+  // filter(array, fn): a new array of the elements for which fn returns a
+  // truthy value, in order. Only false and nil are falsy, so 0 and the empty
+  // string are kept. The original array is left untouched.
+  define("filter", 2, 2, (args, pos) => {
+    const array = arg(args, 0);
+    const fn = arg(args, 1);
+    if (!Array.isArray(array)) {
+      throw new RuntimeError(
+        `filter expects an array, got ${typeOf(array)}`,
+        pos,
+      );
+    }
+    if (typeOf(fn) !== "function") {
+      throw new RuntimeError(
+        `filter expects a function, got ${typeOf(fn)}`,
+        pos,
+      );
+    }
+    return array.filter((el) => isTruthy(call(fn, [el], pos)));
+  });
+
+  // reduce(array, fn, initial): folds array left to right. Starting from
+  // initial, each element updates the accumulator to fn(accumulator, element).
+  // Returns initial unchanged for an empty array.
+  define("reduce", 3, 3, (args, pos) => {
+    const array = arg(args, 0);
+    const fn = arg(args, 1);
+    if (!Array.isArray(array)) {
+      throw new RuntimeError(
+        `reduce expects an array, got ${typeOf(array)}`,
+        pos,
+      );
+    }
+    if (typeOf(fn) !== "function") {
+      throw new RuntimeError(
+        `reduce expects a function, got ${typeOf(fn)}`,
+        pos,
+      );
+    }
+    let acc = arg(args, 2);
+    for (const el of array) {
+      acc = call(fn, [acc, el], pos);
+    }
+    return acc;
   });
 
   // floor(n): the largest integer less than or equal to n.

@@ -554,6 +554,77 @@ describe("builtins", () => {
     );
   });
 
+  it("map applies a function to every element without mutating the original", () => {
+    expect(runOutput("print(map([1, 2, 3], fun(x) { return x * x; }));")).toBe(
+      "[1, 4, 9]\n",
+    );
+    expect(runOutput('print(map(["a", "b"], upper));')).toBe('["A", "B"]\n');
+    expect(runOutput("print(map([], fun(x) { return x; }));")).toBe("[]\n");
+    expect(
+      runOutput(
+        "let a = [1, 2]; let b = map(a, fun(x) { return x + 1; }); print(b); print(a);",
+      ),
+    ).toBe("[2, 3]\n[1, 2]\n");
+    expect(runError("map(5, fun(x) { return x; });").message).toContain(
+      "map expects an array, got number",
+    );
+    expect(runError("map([1], 5);").message).toContain(
+      "map expects a function, got number",
+    );
+    // The function's own arity is still checked at each call.
+    expect(runError("map([1, 2], fun(a, b) { return a; });").message).toContain(
+      "expects 2 arguments, got 1",
+    );
+  });
+
+  it("filter keeps elements whose function result is truthy", () => {
+    expect(
+      runOutput("print(filter([1, 2, 3, 4], fun(x) { return x % 2 == 0; }));"),
+    ).toBe("[2, 4]\n");
+    // Only false and nil are falsy, so 0 and the empty string survive.
+    expect(
+      runOutput('print(filter([0, 1, nil, false, ""], fun(x) { return x; }));'),
+    ).toBe('[0, 1, ""]\n');
+    expect(runOutput("print(filter([], fun(x) { return true; }));")).toBe(
+      "[]\n",
+    );
+    expect(
+      runOutput(
+        "let a = [1, 2, 3]; let b = filter(a, fun(x) { return x > 1; }); print(b); print(a);",
+      ),
+    ).toBe("[2, 3]\n[1, 2, 3]\n");
+    expect(runError('filter("ab", fun(x) { return x; });').message).toContain(
+      "filter expects an array, got string",
+    );
+    expect(runError("filter([1], nil);").message).toContain(
+      "filter expects a function, got nil",
+    );
+  });
+
+  it("reduce folds an array from an initial accumulator", () => {
+    expect(
+      run("reduce([1, 2, 3, 4], fun(acc, x) { return acc + x; }, 0);").result,
+    ).toBe(10);
+    expect(
+      run('reduce(["a", "b", "c"], fun(acc, x) { return acc + x; }, "");').result,
+    ).toBe("abc");
+    // An empty array yields the initial value unchanged, without calling fn.
+    expect(run("reduce([], fun(acc, x) { return acc + x; }, 42);").result).toBe(
+      42,
+    );
+    expect(
+      run(
+        "reduce([3, 1, 2], fun(acc, x) { if (x > acc) { return x; } return acc; }, 0);",
+      ).result,
+    ).toBe(3);
+    expect(runError("reduce(5, fun(acc, x) { return acc; }, 0);").message).toContain(
+      "reduce expects an array, got number",
+    );
+    expect(runError("reduce([1], 5, 0);").message).toContain(
+      "reduce expects a function, got number",
+    );
+  });
+
   it("floor, ceil, and abs compute numeric helpers", () => {
     expect(run("floor(3.7);").result).toBe(3);
     expect(run("floor(-3.2);").result).toBe(-4);
