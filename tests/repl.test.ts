@@ -69,6 +69,10 @@ describe("ensureTerminated", () => {
   it("keeps a trailing line comment from swallowing the terminator", () => {
     expect(ensureTerminated("1 + 2 // sum")).toBe("1 + 2 // sum\n;");
   });
+
+  it("does not mistake a comment's punctuation for a terminator", () => {
+    expect(ensureTerminated("1 + 2 // ;")).toBe("1 + 2 // ;\n;");
+  });
 });
 
 describe("evaluateReplInput", () => {
@@ -77,6 +81,20 @@ describe("evaluateReplInput", () => {
     expect(session.feed("1 + 2")).toBe("3\n");
     expect(session.feed('"hi"')).toBe('"hi"\n');
     expect(session.feed("[1, 2]")).toBe("[1, 2]\n");
+  });
+
+  it("accepts map and function expressions without a trailing semicolon", () => {
+    const session = makeSession();
+    expect(session.feed("{answer: 42}")).toBe('{"answer": 42}\n');
+    expect(session.feed("fun() { return 42; }")).toBe("<fun>\n");
+    expect(session.feed("let f = fun() { return 42; }")).toBe("");
+    expect(session.feed("f()")).toBe("42\n");
+  });
+
+  it("accepts expressions when a trailing comment ends in punctuation", () => {
+    const session = makeSession();
+    expect(session.feed("40 + 2 // ;")).toBe("42\n");
+    expect(session.feed("40 + 2 // }")).toBe("42\n");
   });
 
   it("does not echo nil results or non-expression statements", () => {

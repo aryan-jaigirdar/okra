@@ -48,9 +48,15 @@ export function inputIsIncomplete(source: string): boolean {
  * cannot swallow it.
  */
 export function ensureTerminated(source: string): string {
-  const trimmed = source.trimEnd();
-  if (trimmed === "" || trimmed.endsWith(";") || trimmed.endsWith("}")) {
-    return source;
+  const { tokens, errors } = new Lexer(source).scan();
+  const last = tokens[tokens.length - 2]; // skip EOF and ignore comments
+  if (errors.length > 0 || last === undefined || last.type === "SEMICOLON") return source;
+  // A closing brace can end a block or an expression. Keep complete blocks
+  // unchanged, but terminate maps, anonymous functions, and their bindings.
+  if (last.type === "RBRACE") {
+    const parser = new Parser(tokens);
+    parser.parseProgram();
+    if (parser.errors.length === 0) return source;
   }
   return source + "\n;";
 }
