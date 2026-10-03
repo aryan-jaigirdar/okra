@@ -28,7 +28,10 @@
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "dev": "tsx src/cli.ts",
-    "repl": "tsx src/cli.ts repl"
+    "repl": "tsx src/cli.ts repl",
+    "playground": "npm run build && node scripts/serve-playground.mjs",
+    "test:playground": "npm run build && node --test scripts/check-worker.mjs",
+    "build:playground": "npm run build && node scripts/build-playground.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6ef">
+  <meta name="description" content="Try okra, a small scripting language built from scratch. Write programs, inspect tokens and syntax trees, and run real closures in your browser.">
+  <title>okra · language playground</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.mjs"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="wordmark" href="#main" aria-label="okra playground home"><span class="logo" aria-hidden="true">o</span>okra<span class="wordmark-note">/ language lab</span></a>
+    <a class="source-link" href="https://github.com/aryan-jaigirdar/okra" target="_blank" rel="noreferrer">Read the source <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main">
+    <section class="intro" aria-labelledby="title">
+      <div><p class="eyebrow"><span class="dot"></span> BUILT FROM FIRST PRINCIPLES</p><h1 id="title">A tiny language.<br><span>Real ideas.</span></h1><p class="description">Closures, collections, and a whole language pipeline.<br>Write a little code. See what happens underneath.</p></div>
+      <div class="intro-note"><span class="note-label">THE EXPERIMENT</span><p>What if you could understand<br>a language by taking it apart?</p><div class="facts"><span><b>7</b> value types</span><span><b>0</b> runtime dependencies</span></div></div>
+    </section>
+    <section class="workspace" aria-label="Interactive language playground">
+      <div class="workspace-top"><div class="file-name"><span aria-hidden="true">◈</span> playground.okra</div><div class="example-picker"><label for="examples">Start with an example</label><select id="examples"><option value="closures">Stateful closures</option><option value="collections">Map, filter, reduce</option><option value="fibonacci">Memoized Fibonacci</option><option value="errors">A useful error</option><option value="loop">An endless loop</option></select></div></div>
+      <div class="panels">
+        <div class="editor-panel"><div class="panel-label">SOURCE <span>EDITABLE · OKRA</span></div><div class="code-editor"><pre id="line-numbers" aria-hidden="true"></pre><textarea id="source" aria-label="Okra source code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea></div><div class="editor-bottom"><span id="line-count">0 lines</span><span>⌘ / Ctrl + Enter to run</span></div></div>
+        <div class="output-panel"><div class="output-toolbar"><div class="mode-tabs" aria-label="Output mode"><button class="mode active" aria-pressed="true" data-mode="run">Output</button><button class="mode" aria-pressed="false" data-mode="tokens">Tokens</button><button class="mode" aria-pressed="false" data-mode="ast">Syntax tree</button></div><span class="terminal-dot" aria-hidden="true"></span></div><pre id="output" role="log" aria-label="Program output" aria-live="polite">Ready when you are.
+
+Run the example, or make it your own.</pre><div class="output-bottom"><span id="status" role="status">Ready</span><span id="timing">RUNS IN YOUR BROWSER</span></div></div>
+      </div>
+      <div class="workspace-bottom"><p><span class="privacy-dot" aria-hidden="true"></span> Code stays in this tab. Each run starts fresh.</p><div class="actions"><button id="reset">Reset example</button><button id="stop" disabled>Stop</button><button id="run" class="primary">Run program <span aria-hidden="true">▶</span></button></div></div>
+    </section>
+    <section class="underneath" aria-labelledby="underneath-title"><div><p class="eyebrow">NO MAGIC BOXES</p><h2 id="underneath-title">One source. Three ways to look at it.</h2></div><ol class="pipeline"><li><span class="step">01</span><div><h3>Scan</h3><p>Characters become tokens.<br>Every token keeps its location.</p></div></li><li><span class="step">02</span><div><h3>Parse</h3><p>A Pratt parser builds the tree.<br>Precedence becomes structure.</p></div></li><li><span class="step">03</span><div><h3>Evaluate</h3><p>Walk the tree. Follow each scope.<br>A closure remembers its home.</p></div></li></ol></section>
+    <p class="limits">Runs stop after 2 seconds. Output is limited to 64,000 characters.</p>
+  </main>
+  <footer><span>Designed &amp; built by Aryan Jaigirdar</span><a href="https://github.com/aryan-jaigirdar/okra#language-tour" target="_blank" rel="noreferrer">Language guide ↗</a></footer>
+</body>
+</html>
