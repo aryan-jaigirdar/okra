@@ -25,12 +25,48 @@ let tick = makeCounter(2);
 print(tick(), tick(), tick()); // 2 4 6
 ```
 
+## Try the browser playground
+
+![The okra browser playground running the real closure example](docs/playground-desktop.png)
+
+[See the phone-sized browser view](docs/playground-mobile.png).
+
+Run the real interpreter in a browser, including on a phone-sized screen:
+
+```sh
+npm ci
+npm run playground
+```
+
+Open http://127.0.0.1:4174/web/. Edit the closure example, then select **Run
+program**. Switch to **Tokens** or **Syntax tree** to inspect the same source.
+Try the error example to see source locations, or the endless loop to test
+**Stop** and the automatic two-second deadline. Each run has a fresh global
+scope. The editor does not send source code to a server.
+
+The playground uses the existing compiled TypeScript modules without a
+separate interpreter or a runtime framework. A disposable module worker
+keeps evaluation off the page's event loop. Source and output limits reduce
+accidental resource use; worker termination is an availability control, not
+a security sandbox or a hard memory ceiling. Serve it over HTTP, rather
+than opening the HTML as a local file. The local server binds to loopback.
+
+Build a portable static site with `npm run build:playground`. The generated
+`site/` directory includes the page and compiled interpreter modules. It can
+be served by a static host without a backend or a Node process. This command
+prepares an artifact; it does not publish a deployment.
+
+For a demo, change `makeCounter(2)` to `makeCounter(3)`, run it, then inspect
+the tree. The output changes because the closure retains and updates its
+own captured environment. This shows the implementation directly instead of
+requiring a viewer to install the CLI first.
+
 ## Quickstart
 
 Requires Node 20 or newer.
 
 ```sh
-npm install
+npm ci
 npm run build
 
 # Run a program
@@ -504,6 +540,16 @@ Honest ones, by design or by scope:
   beyond 2^53 and decimal fractions.
 - The call depth is capped (at 1000) to report deep recursion as a clean
   runtime error instead of crashing the host stack.
+
+## Validation
+
+`npm test` exercises the language pipeline, all bundled programs, REPL
+input, and the browser entry point. `npm run test:playground` builds the
+TypeScript and checks the actual worker module, including termination and a
+fresh run after an endless loop. The CI workflow runs these commands on
+Node 20 and 22. Chromium browser checks at desktop and phone-sized widths
+confirmed execution, tokens, syntax trees, source errors, and the automatic
+deadline. The screenshots above come from those working browser sessions.
 
 ## License
 
